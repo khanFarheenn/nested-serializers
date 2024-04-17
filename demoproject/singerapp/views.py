@@ -26,32 +26,29 @@ def hello_world(request):
 def get_singer(request, pk=None):
     if request.method == "GET":
         if pk is not None:
-            singer = Singer.objects.get(pk=pk)
-            serializer = SingersSerializer(singer)
+            singer = get_object_or_404(Singer, pk=pk)
+            serializer = SingersSerializer(singer, context={'request': request})
             return Response(serializer.data)
         else:
             singers_queryset = Singer.objects.all()
-            serialized_data = SingersSerializer(singers_queryset, many=True)
-            return Response({"singer_qureset": serialized_data.data})
-    
+            serialized_data = SingersSerializer(singers_queryset, many=True, context={'request': request})
+            return Response({"singer_queryset": serialized_data.data})
+
     elif request.method == "POST":
-        serializer = SingersSerializer(data=request.data)
+        serializer = SingersSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Singer created successfully."}, status=201)
         return Response(serializer.errors, status=400)
 
     elif request.method == "PUT":
-        try:
-            singer = Singer.objects.get(pk=pk)
-        except Singer.DoesNotExist:
-            return Response({"message": "Singer not found."}, status=404)
-
-        serializer = SingersSerializer(singer, data=request.data)
+        singer = get_object_or_404(Singer, pk=pk)
+        serializer = SingersSerializer(singer, data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Singer updated successfully."})
         return Response(serializer.errors, status=400)
+
     # ===============songs========
 
 @api_view(['GET', 'POST', 'PUT', 'DELETE'])
@@ -59,14 +56,14 @@ def get_songs(request, pk=None):
     if request.method == 'GET':
         if pk:
             song = get_object_or_404(Song, pk=pk)
-            serializer = SongsSerializer(song)
+            serializer = SongsSerializer(song, context={'request': request})
         else:
             songs = Song.objects.all()
-            serializer = SongsSerializer(songs, many=True)
+            serializer = SongsSerializer(songs, many=True, context={'request': request})
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = SongsSerializer(data=request.data)
+        serializer = SongsSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Song created successfully."}, status=201)
@@ -74,7 +71,7 @@ def get_songs(request, pk=None):
 
     elif request.method == 'PUT':
         song = get_object_or_404(Song, pk=pk)
-        serializer = SongsSerializer(song, data=request.data, partial=True)
+        serializer = SongsSerializer(song, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Song updated successfully."})
