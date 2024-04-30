@@ -31,12 +31,12 @@ class SongsSerializer(serializers.ModelSerializer):
 
 # other way to work nested serialzer
 class SingersSerializer(serializers.ModelSerializer):
-    # songs = SongsSerializer(many=True)
-    songs = serializers.SerializerMethodField()
+    songs = SongsSerializer(many=True)
+    # songs = serializers.SerializerMethodField()
     
  
-    def get_songs(self, obj):
-        return SongsSerializer(obj.songs.all(), many=True).data
+    # def get_songs(self, obj):
+    #     return SongsSerializer(obj.songs.all(), many=True).data
 
     class Meta:
         model = Singer

@@ -41,6 +41,7 @@ def get_singer(request, pk=None):
             return Response({"message": "Singer created successfully."}, status=201)
         return Response(serializer.errors, status=400)
 
+
     elif request.method == "PUT":
         try:
             singer = Singer.objects.get(pk=pk)
